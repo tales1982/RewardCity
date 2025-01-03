@@ -1,80 +1,73 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-// Declaração do contrato RewardCity
-contract RewardCity {
+interface IERC20 {
+    function totalSupply() external view returns (uint256);
+    function balanceOf(address account) external view returns (uint256);
+    function transfer(address recipient, uint256 amount) external returns (bool);
+    function allowance(address owner, address spender) external view returns (uint256);
+    function approve(address spender, uint256 amount) external returns (bool);
+    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
 
-    // Mapeamento que armazena os saldos dos usuários (endereço -> saldo)
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+}
+
+contract RewardCity is IERC20 {
     mapping(address => uint256) private _balances;
-
-    // Mapeamento que armazena as permissões para transferências (dono dos fundos -> (autorizado -> valor permitido))
     mapping(address => mapping(address => uint256)) private _allowances;
+    uint256 private _totalSupply;
 
-    // Evento emitido quando ocorre uma transferência de tokens
-    event Transfer(address indexed _from, address indexed _to, uint256 _value);
-
-    // Evento emitido quando ocorre uma aprovação de gasto
-    event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-
-    // Construtor que inicializa o contrato e define o saldo total para o criador do contrato
     constructor() {
-        _balances[msg.sender] = totalSupply(); // O criador do contrato recebe o total de tokens emitidos
+        _totalSupply = 100000 * 10 ** decimals();
+        _balances[msg.sender] = _totalSupply;
     }
 
-    // Retorna o nome do token (padrão ERC20)
     function name() public pure returns (string memory) {
-        return "RewardCity"; // Nome do token
+        return "RewardCity";
     }
 
-    // Retorna o símbolo do token (padrão ERC20)
     function symbol() public pure returns (string memory) {
-        return "RWCT"; // Símbolo do token
+        return "RWCT";
     }
 
-    // Retorna o número de casas decimais do token (padrão ERC20)
     function decimals() public pure returns (uint8) {
-        return 18; // 18 casas decimais, o padrão mais comum em tokens ERC20
+        return 18;
     }
 
-    // Retorna a quantidade total de tokens emitidos (padrão ERC20)
-    function totalSupply() public view returns (uint256) {
-        return 100000 * 10 ** decimals(); // Total de 100.000 tokens com 18 casas decimais
+    function totalSupply() public view override returns (uint256) {
+        return _totalSupply;
     }
 
-    // Retorna o saldo de tokens de um endereço específico (padrão ERC20)
-    function balanceOf(address _owner) public view returns (uint256) {
-        return _balances[_owner]; // Saldo do endereço fornecido
-    }
-    
-    // Transfere tokens do remetente para um destinatário (padrão ERC20)
-    function transfer(address _to, uint256 _value) public returns (bool) {
-        require(balanceOf(msg.sender) >= _value, "Insufficient balance"); // Verifica se o remetente tem saldo suficiente
-        _balances[msg.sender] -= _value; // Deduz o valor do saldo do remetente
-        _balances[_to] += _value; // Adiciona o valor ao saldo do destinatário
-        emit Transfer(msg.sender, _to, _value); // Emite o evento de transferência
-        return true; // Retorna verdadeiro se a transferência foi bem-sucedida
+    function balanceOf(address account) public view override returns (uint256) {
+        return _balances[account];
     }
 
-    // Transfere tokens em nome de outro endereço, com base em uma permissão prévia (padrão ERC20)
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
-        require(_allowances[_from][msg.sender] >= _value, "Insufficient allowance"); // Verifica se há permissão suficiente
-        require(balanceOf(_from) >= _value, "Insufficient balance"); // Verifica se o remetente tem saldo suficiente
-        _balances[_from] -= _value; // Deduz o valor do saldo do remetente
-        _balances[_to] += _value; // Adiciona o valor ao saldo do destinatário
-        _allowances[_from][msg.sender] -= _value; // Reduz a permissão de gasto
-        emit Transfer(_from, _to, _value); // Emite o evento de transferência
-        return true; // Retorna verdadeiro se a transferência foi bem-sucedida
+    function transfer(address recipient, uint256 amount) public override returns (bool) {
+        require(_balances[msg.sender] >= amount, "Insufficient balance");
+        _balances[msg.sender] -= amount;
+        _balances[recipient] += amount;
+        emit Transfer(msg.sender, recipient, amount);
+        return true;
     }
 
-    // Aprova um endereço para gastar uma quantidade específica de tokens em nome do remetente (padrão ERC20)
-    function approve(address _spender, uint256 _value) public returns (bool) {
-        _allowances[msg.sender][_spender] = _value; // Define a permissão para o endereço autorizado
-        emit Approval(msg.sender, _spender, _value); // Emite o evento de aprovação
-        return true; // Retorna verdadeiro se a aprovação foi bem-sucedida
+    function allowance(address owner, address spender) public view override returns (uint256) {
+        return _allowances[owner][spender];
     }
 
-    // Retorna o valor permitido para um endereço gastar em nome de outro (padrão ERC20)
-    function allowances(address _owner, address _spender) public view returns (uint256) {
-        return _allowances[_owner][_spender]; // Retorna a permissão de gasto
+    function approve(address spender, uint256 amount) public override returns (bool) {
+        _allowances[msg.sender][spender] = amount;
+        emit Approval(msg.sender, spender, amount);
+        return true;
+    }
+
+    function transferFrom(address sender, address recipient, uint256 amount) public override returns (bool) {
+        require(_allowances[sender][msg.sender] >= amount, "Insufficient allowance");
+        require(_balances[sender] >= amount, "Insufficient balance");
+        _balances[sender] -= amount;
+        _balances[recipient] += amount;
+        _allowances[sender][msg.sender] -= amount;
+        emit Transfer(sender, recipient, amount);
+        return true;
     }
 }

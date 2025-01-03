@@ -53,7 +53,7 @@ describe("RewardCity", function () {
 
   it("Should allow approving another address to spend tokens", async function () {
     await rewardCity.approve(addr1.address, BigInt("5000000000000000000")); // 5 tokens
-    const allowance = await rewardCity.allowances(owner.address, addr1.address);
+    const allowance = await rewardCity.allowance(owner.address, addr1.address);
 
     expect(BigInt(allowance)).to.equal(BigInt("5000000000000000000"));
   });
