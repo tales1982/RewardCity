@@ -166,3 +166,85 @@ Chave Privada Inválida: Certifique-se de que sua chave privada está correta e 
 
 Chain ID Incorreto: Verifique se o chainId em hardhat.config.js corresponde à rede configurada no Alchemy e MetaMask.
 
+===========================================================================================================================
+## Funcionalidades Padrão ERC20
+
+1. **totalSupply:**
+Retorna o total de tokens emitidos no contrato.
+
+2. **balanceOf:**
+Retorna o saldo de tokens de uma conta específica.
+
+3. **transfer:**
+Permite que o remetente transfira tokens para um destinatário, descontando uma taxa de transação.
+
+4. **allowance:**
+Retorna o valor que um endereço está autorizado a gastar de outro endereço.
+
+5. **approve:**
+Autoriza um endereço a gastar uma quantidade específica de tokens em nome do remetente.
+
+6. **transferFrom:**
+Transfere tokens de uma conta para outra usando a permissão previamente concedida por approve.
+
+## Funcionalidades Adicionais
+Tokenomics
+7. **Taxa de Transação (_transactionFee):**
+Taxa aplicada a cada transferência de tokens.
+Configurável pelo proprietário até um limite de 5%.
+
+8. **Tesouraria (_treasury):**
+Endereço que acumula as taxas de transação.
+Pode ser atualizado pelo proprietário.
+
+## Governança
+9. **Criação de Propostas (createProposal):**
+Permite que o proprietário crie uma proposta com descrição e destinatários para recompensas.
+
+10. **Votação em Propostas (vote):**
+Permite que titulares de tokens votem em propostas ativas.
+
+11. **Execução de Propostas (executeProposal):**
+Distribui recompensas para os destinatários da proposta com base nos votos e saldos.
+
+## Segurança
+12. **Lista Negra (blacklistAddress, isBlacklisted):**
+Permite ao proprietário adicionar ou remover endereços da lista negra.
+Transferências envolvendo endereços na lista negra são bloqueadas.
+
+13. **Pausar e Retomar Funções (pauseTransfers, unpauseTransfers):**
+Permite ao proprietário pausar e retomar transferências de tokens em casos de emergência.
+
+14. **Proteção Contra Reentrância (nonReentrant):**
+Evita ataques de reentrância em funções críticas, como a execução de propostas.
+
+## Manipulação de Tokens
+15. **Queima de Tokens (burn):**
+Permite que um usuário reduza sua quantidade de tokens, diminuindo o total de tokens emitidos.
+
+16. **Criação de Tokens (mint):**
+Permite ao proprietário criar novos tokens e creditá-los a um endereço específico.
+
+## Outras Funcionalidades
+17. **Definição de Nome e Símbolo:**
+name: Nome do token ("RewardCity").
+symbol: Símbolo do token ("REWA").
+
+18. **Decimais:**
+Define a unidade mínima do token como 10^(-18).
+
+## Eventos
+
+19. **Transfer:**
+Emitido em transferências de tokens, incluindo queimas e recompensas.
+
+20. **Approval:**
+Emitido ao conceder permissão a um endereço para gastar tokens.
+
+21. **ProposalCreated:**
+Emitido ao criar uma nova proposta.
+
+22. **ProposalVoted:**
+Emitido ao votar em uma proposta.
+
+

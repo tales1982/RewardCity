@@ -6,8 +6,11 @@ module.exports = {
   networks: {
     polygonAmoyTestnet: {
       url: process.env.ALCHEMY_API_URL,
-      accounts: [process.env.PRIVATE_KEY],
-      chainId: 80002, // Verifique se o Chain ID da Amoy é 80001 ou outro específico
+      accounts:
+        process.env.PRIVATE_KEY && process.env.PRIVATE_KEY_TREASURY
+          ? [process.env.PRIVATE_KEY, process.env.PRIVATE_KEY_TREASURY]
+          : [],
+      chainId: 11155111, // Chain ID da Sepolia
     },
   },
 };
