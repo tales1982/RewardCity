@@ -58,116 +58,88 @@ balanceOf(address): Retorna o saldo de um usuário.
 Licença   
 Este projeto está licenciado sob a licença MIT.   
 
-
 # Como Fazer o Deploy do Contrato RewardCity
 
-Este guia explica como configurar e fazer o deploy do contrato RewardCity em uma rede blockchain usando Hardhat.
+### Pré-requisitos
 
-Pré-requisitos
+1. **Node.js**
+   - Certifique-se de ter o Node.js instalado (versão 20 ou superior).
 
-Node.js: Certifique-se de ter o Node.js instalado  versão v20
+2. **Conta MetaMask**
+   - Configure uma conta MetaMask com a rede desejada (testnet ou mainnet).
 
+3. **Chave Privada e Alchemy**
+   - **Chave privada:** Extraía do MetaMask.
+   - **URL da API RPC:** Use o Alchemy ou outro provedor para a rede desejada.
 
-Conta MetaMask: Certifique-se de ter uma conta MetaMask configurada com a rede desejada (testnet ou mainnet).
+### Configuração do Projeto
 
-Chave Privada e Alchemy:
+#### 1. Configure as Variáveis de Ambiente
+Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
 
-Chave privada de sua conta MetaMask.
-
-URL da API da rede blockchain configurada no Alchemy ou outro provedor RPC.
-
-Configuração do Projeto
-
-Configure as Variáveis de Ambiente:
-Crie um arquivo .env na raiz do projeto com o seguinte conteúdo:
-
+```
 ALCHEMY_API_URL=<URL_DA_API_ALCHEMY>
 PRIVATE_KEY=<SUA_CHAVE_PRIVADA>
+```
 
-Exemplo:
+**Exemplo:**
 
+```
 ALCHEMY_API_URL=https://polygon-mumbai.g.alchemy.com/v2/seu-api-key
-PRIVATE_KEY=87aa50abe3ebf1b6feea3778dda117c809cc50b3130daf6141dff5a5eedfa738
+PRIVATE_KEY=0000000000000000000000000000000000000000000000000000000000
+```
 
-Verifique o Arquivo hardhat.config.js:
-Certifique-se de que o arquivo hardhat.config.js contém a configuração para a rede desejada. Por exemplo:
+#### 2. Verifique o Arquivo `hardhat.config.js`
+Certifique-se de que o arquivo `hardhat.config.js` está configurado para a rede desejada:
 
-require("dotenv").config();
-require("@nomicfoundation/hardhat-toolbox");
+### Script de Deploy
+Certifique-se de que o arquivo `scripts/deploy.js` está configurado corretamente:
 
-module.exports = {
-  solidity: "0.8.24",
-  networks: {
-    polygonAmoyTestnet: {
-      url: process.env.ALCHEMY_API_URL,
-      accounts: [process.env.PRIVATE_KEY],
-      chainId: 80002, // Chain ID da rede Polygon Amoy Testnet
-    },
-  },
-};
+### Fazendo o Deploy
 
-Script de Deploy
-
-Certifique-se de que o arquivo scripts/deploy.js está configurado corretamente:
-
-const hre = require("hardhat");
-
-async function main() {
-  const RewardCity = await hre.ethers.getContractFactory("RewardCity");
-  const rewardCity = await RewardCity.deploy();
-
-  await rewardCity.deployed();
-
-  console.log(`RewardCity deployed to: ${rewardCity.target}`);
-}
-
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
-
-Fazendo o Deploy
-
-Certifique-se de que o Node.js está em uma versão suportada:
-
+#### 1. Certifique-se de estar usando a versão correta do Node.js
+```bash
 nvm use 20
+```
 
-Compile o Contrato:
-
+#### 2. Compile o Contrato
+```bash
 npx hardhat compile
+```
 
-Faça o Deploy:
+#### 3. Realize o Deploy
+```bash
+npx hardhat run scripts/deploy.js --network sepolia
 
-npx hardhat run scripts/deploy.js --network polygonAmoyTestnet
+```
 
-Resultado Esperado:
-Se o deploy for bem-sucedido, você verá uma saída como esta:
+### Resultado Esperado
+Se o deploy for bem-sucedido, você verá algo como:
 
+```
 RewardCity deployed to: 0x0000000000000000000000000000000000000000
+```
 
 O endereço exibido é onde o contrato foi implantado na rede.
 
-Verificação do Contrato
+### Verificação do Contrato
 
-Acesse um Explorador de Blocos:
-Use um explorador compatível (como o PolygonScan para redes Polygon).
+1. **Acesse um Explorador de Blocos**
+   - Use um explorador compatível (como o PolygonScan para redes Polygon).
 
-Insira o Endereço do Contrato:
-Cole o endereço do contrato implantado para verificar sua existência e interagir com ele.
+2. **Insira o Endereço do Contrato**
+   - Cole o endereço do contrato implantado para verificar sua existência e interagir com ele.
 
-Dicas Adicionais
+### Dicas Adicionais
 
-Obter Tokens Faucet:
-Para interagir com a testnet, você precisará de tokens de teste (faucet). Use um faucet como Polygon Faucet.
+- **Obtenha Tokens Faucet:**
+  - Para interagir com a testnet, obtenha tokens de teste usando faucets como [Polygon Faucet](https://faucet.polygon.technology/).
 
-Erros Comuns:
+- **Corrija Erros Comuns:**
+  - **Chave Privada Inválida:** Verifique se a chave privada é válida e tem 64 caracteres.
+  - **Chain ID Incorreto:** Certifique-se de que o `chainId` em `hardhat.config.js` corresponde à rede configurada no Alchemy e MetaMask.
 
-Chave Privada Inválida: Certifique-se de que sua chave privada está correta e possui 64 caracteres.
-
-Chain ID Incorreto: Verifique se o chainId em hardhat.config.js corresponde à rede configurada no Alchemy e MetaMask.
-
-===========================================================================================================================
-## Funcionalidades Padrão ERC20
+# Funcionalidades Padrão ERC20
 
 1. **totalSupply:**
 Retorna o total de tokens emitidos no contrato.
@@ -188,7 +160,9 @@ Autoriza um endereço a gastar uma quantidade específica de tokens em nome do r
 Transfere tokens de uma conta para outra usando a permissão previamente concedida por approve.
 
 ## Funcionalidades Adicionais
-Tokenomics
+
+### Tokenomics
+
 7. **Taxa de Transação (_transactionFee):**
 Taxa aplicada a cada transferência de tokens.
 Configurável pelo proprietário até um limite de 5%.
@@ -197,54 +171,39 @@ Configurável pelo proprietário até um limite de 5%.
 Endereço que acumula as taxas de transação.
 Pode ser atualizado pelo proprietário.
 
-## Governança
-9. **Criação de Propostas (createProposal):**
-Permite que o proprietário crie uma proposta com descrição e destinatários para recompensas.
-
-10. **Votação em Propostas (vote):**
-Permite que titulares de tokens votem em propostas ativas.
-
-11. **Execução de Propostas (executeProposal):**
-Distribui recompensas para os destinatários da proposta com base nos votos e saldos.
-
 ## Segurança
-12. **Lista Negra (blacklistAddress, isBlacklisted):**
+
+9. **Lista Negra (blacklistAddress, isBlacklisted):**
 Permite ao proprietário adicionar ou remover endereços da lista negra.
 Transferências envolvendo endereços na lista negra são bloqueadas.
 
-13. **Pausar e Retomar Funções (pauseTransfers, unpauseTransfers):**
+10. **Pausar e Retomar Funções (pauseTransfers, unpauseTransfers):**
 Permite ao proprietário pausar e retomar transferências de tokens em casos de emergência.
 
-14. **Proteção Contra Reentrância (nonReentrant):**
-Evita ataques de reentrância em funções críticas, como a execução de propostas.
+11. **Proteção Contra Reentrância (nonReentrant):**
+Evita ataques de reentrância em funções críticas.
 
 ## Manipulação de Tokens
-15. **Queima de Tokens (burn):**
+
+12. **Queima de Tokens (burn):**
 Permite que um usuário reduza sua quantidade de tokens, diminuindo o total de tokens emitidos.
 
-16. **Criação de Tokens (mint):**
+13. **Criação de Tokens (mint):**
 Permite ao proprietário criar novos tokens e creditá-los a um endereço específico.
 
 ## Outras Funcionalidades
-17. **Definição de Nome e Símbolo:**
+
+14. **Definição de Nome e Símbolo:**
 name: Nome do token ("RewardCity").
 symbol: Símbolo do token ("REWA").
 
-18. **Decimais:**
+15. **Decimais:**
 Define a unidade mínima do token como 10^(-18).
 
 ## Eventos
 
-19. **Transfer:**
+16. **Transfer:**
 Emitido em transferências de tokens, incluindo queimas e recompensas.
 
-20. **Approval:**
+17. **Approval:**
 Emitido ao conceder permissão a um endereço para gastar tokens.
-
-21. **ProposalCreated:**
-Emitido ao criar uma nova proposta.
-
-22. **ProposalVoted:**
-Emitido ao votar em uma proposta.
-
-
