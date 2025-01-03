@@ -133,9 +133,65 @@ describe("RewardCity", function () {
     expect(balance1).to.be.gt(0); // Saldo de addr1 deve aumentar
     expect(balance2).to.be.gt(0); // Saldo de addr2 deve aumentar
   });
+
+  it("Should create a campaign proposal", async function () {
+    const recipients = [addr1.address, addr2.address];
+    const description = "Campaign for rewards distribution";
+    
+    await rewardCity.createProposal(description, recipients);
   
+    // Verifique se a proposta existe
+    const proposal = await rewardCity.proposals(0);
+    expect(proposal).to.not.be.undefined;
   
-  
+    // Verifique os detalhes da proposta
+    expect(proposal.description).to.equal(description);
+    expect(proposal.recipients).to.deep.equal(recipients);
+    expect(proposal.executed).to.equal(false);
+  });
   
 
+  it("Should allow token holders to vote for a campaign", async function () {
+    const recipients = [addr1.address, addr2.address];
+    await rewardCity.createProposal("Vote for rewards", recipients);
+  
+    const voteAmount = BigInt("1000000000000000000"); // 1 token
+    const fee = (voteAmount * BigInt(10)) / BigInt(1000); // 1% de taxa
+    const amountAfterFee = voteAmount - fee;
+  
+    await rewardCity.transfer(addr1.address, voteAmount);
+  
+    await rewardCity.connect(addr1).vote(0);
+    const proposal = await rewardCity.proposals(0);
+  
+    expect(proposal.votes).to.equal(amountAfterFee);
+  });
+  
+  it("Should execute a campaign proposal and distribute rewards", async function () {
+    const recipients = [addr1.address, addr2.address];
+    await rewardCity.createProposal("Distribute rewards", recipients);
+  
+    const initialBalance1 = await rewardCity.balanceOf(addr1.address);
+    const initialBalance2 = await rewardCity.balanceOf(addr2.address);
+  
+    const voteAmount = BigInt("2000000000000000000"); // 2 tokens
+    const fee = (voteAmount * BigInt(10)) / BigInt(1000); // 1% de taxa
+    const amountAfterFee = voteAmount - fee;
+  
+    await rewardCity.transfer(addr1.address, voteAmount);
+    await rewardCity.connect(addr1).vote(0);
+  
+    // Execute a proposta
+    await rewardCity.executeProposal(0);
+  
+    const expectedReward = amountAfterFee / BigInt(recipients.length);
+  
+    const finalBalance1 = await rewardCity.balanceOf(addr1.address);
+    const finalBalance2 = await rewardCity.balanceOf(addr2.address);
+  
+    expect(finalBalance1).to.equal(initialBalance1 + expectedReward);
+    expect(finalBalance2).to.equal(initialBalance2 + expectedReward);
+  });
+  
+  
 });
